@@ -51,6 +51,15 @@ QUnit.module('Тестируем функцию transform', () => {
         assert.deepEqual(originalObject, { a: 1, b: { c: 2 } }, 'Исходный объект и вложенный объект не должны измениться');
     });
 
+    QUnit.test('Не копирует унаследованные свойства', (assert) => {
+        const proto = { inherited: 'oops' };
+        const originalObject = Object.create(proto);
+        originalObject.own = 1;
+        const result = transform(originalObject, (value) => value);
+
+        assert.deepEqual(result, { own: 1 }, 'В результате должны быть только собственные свойства');
+    });
+
     QUnit.test('Бросает TypeError, если obj не объект', (assert) => {
         const transformFunction = (value) => value * 2;
 

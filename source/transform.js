@@ -31,21 +31,30 @@ const transform = (obj, transformFn) => {
         throw new TypeError('Аргумент transformFn должен быть функцией');
     }
 
-    // Массив копируем в массив, объект - в объект, чтобы не потерять исходный тип
-    const result = Array.isArray(obj) ? [] : {};
-
-    for (const key in obj) {
-        const value = obj[key];
-
+    /**
+     * Преобразует одно значение: вложенный объект или массив обрабатывает
+     * рекурсивно, простое значение передаёт в transformFn
+     * @param {*} value - значение из объекта или элемент массива
+     * @returns {*}
+     */
+    const transformValue = (value) => {
         // typeof null === 'object', поэтому null отсеиваем отдельной проверкой
         if (typeof value === 'object' && value !== null) {
             // Вложенный объект или массив разбираем тем же алгоритмом
-            result[key] = transform(value, transformFn);
-        } else {
-            // Простое значение (число, строка, null, ...) - преобразуем
-            result[key] = transformFn(value);
+            return transform(value, transformFn);
         }
+
+        // Простое значение (число, строка, null, ...) - преобразуем
+        return transformFn(value);
+    };
+
+    // map возвращает новый массив той же длины
+    if (Array.isArray(obj)) {
+        return obj.map(transformValue);
     }
 
-    return result;
+    // Разбираем объект на пары [ключ, значение], преобразуем значения и собираем обратно
+    return Object.fromEntries(
+        Object.entries(obj).map(([key, value]) => [key, transformValue(value)])
+    );
 };
