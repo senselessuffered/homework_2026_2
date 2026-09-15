@@ -42,4 +42,12 @@ QUnit.module('Тестируем функцию transform', () => {
 
         assert.deepEqual(result, { a: 'null', b: '1' }, 'null должен попасть в функцию преобразования');
     });
+
+    QUnit.test('Не изменяет исходный объект', (assert) => {
+        const originalObject = { a: 1, b: { c: 2 } };
+        const transformFunction = (value) => value * 2;
+        transform(originalObject, transformFunction);
+
+        assert.deepEqual(originalObject, { a: 1, b: { c: 2 } }, 'Исходный объект и вложенный объект не должны измениться');
+    });
 });
