@@ -60,12 +60,22 @@ QUnit.module('Тестируем функцию transform', () => {
         assert.deepEqual(result, { own: 1 }, 'В результате должны быть только собственные свойства');
     });
 
-    QUnit.test('Бросает TypeError, если obj не объект', (assert) => {
+    QUnit.test('Передаёт вложенные Date и Map в функцию преобразования целиком', (assert) => {
+        const originalObject = { when: new Date(), data: new Map([['a', 1]]) };
+        const transformFunction = (value) => value.constructor.name;
+        const result = transform(originalObject, transformFunction);
+
+        assert.deepEqual(result, { when: 'Date', data: 'Map' }, 'Date и Map должны попасть в функцию преобразования');
+    });
+
+    QUnit.test('Бросает TypeError, если obj не обычный объект и не массив', (assert) => {
         const transformFunction = (value) => value * 2;
 
         assert.throws(() => transform(null, transformFunction), TypeError, 'null - не объект');
         assert.throws(() => transform(42, transformFunction), TypeError, 'Число - не объект');
         assert.throws(() => transform('abc', transformFunction), TypeError, 'Строка - не объект');
+        assert.throws(() => transform(new Date(), transformFunction), TypeError, 'Date - не обычный объект');
+        assert.throws(() => transform(new Map([['a', 1]]), transformFunction), TypeError, 'Map - не обычный объект');
     });
 
     QUnit.test('Бросает TypeError, если transformFn не функция', (assert) => {
