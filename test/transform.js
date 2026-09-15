@@ -68,18 +68,36 @@ QUnit.module('Тестируем функцию transform', () => {
         assert.deepEqual(result, { when: 'Date', data: 'Map' }, 'Date и Map должны попасть в функцию преобразования');
     });
 
-    QUnit.test('Бросает TypeError, если obj не обычный объект и не массив', (assert) => {
+    QUnit.test('Возвращает пустой объект и пустой массив для пустого входа', (assert) => {
         const transformFunction = (value) => value * 2;
 
-        assert.throws(() => transform(null, transformFunction), TypeError, 'null - не объект');
-        assert.throws(() => transform(42, transformFunction), TypeError, 'Число - не объект');
-        assert.throws(() => transform('abc', transformFunction), TypeError, 'Строка - не объект');
-        assert.throws(() => transform(new Date(), transformFunction), TypeError, 'Date - не обычный объект');
-        assert.throws(() => transform(new Map([['a', 1]]), transformFunction), TypeError, 'Map - не обычный объект');
+        assert.deepEqual(transform({}, transformFunction), {}, 'Пустой объект');
+        assert.deepEqual(transform([], transformFunction), [], 'Пустой массив');
+    });
+
+    QUnit.test('Бросает TypeError, если вместо объекта пришёл null, undefined, строка или число', (assert) => {
+        const transformFunction = (value) => value * 2;
+        const expectedError = new TypeError('Аргумент obj должен быть обычным объектом или массивом');
+
+        assert.throws(() => transform(null, transformFunction), expectedError, 'null - не объект');
+        assert.throws(() => transform(undefined, transformFunction), expectedError, 'undefined - не объект');
+        assert.throws(() => transform('abc', transformFunction), expectedError, 'Строка - не объект');
+        assert.throws(() => transform(42, transformFunction), expectedError, 'Число - не объект');
+    });
+
+    QUnit.test('Бросает TypeError, если вместо объекта пришёл Date, Map или Set', (assert) => {
+        const transformFunction = (value) => value * 2;
+        const expectedError = new TypeError('Аргумент obj должен быть обычным объектом или массивом');
+
+        assert.throws(() => transform(new Date(), transformFunction), expectedError, 'Date - не обычный объект');
+        assert.throws(() => transform(new Map([['a', 1]]), transformFunction), expectedError, 'Map - не обычный объект');
+        assert.throws(() => transform(new Set([1]), transformFunction), expectedError, 'Set - не обычный объект');
     });
 
     QUnit.test('Бросает TypeError, если transformFn не функция', (assert) => {
-        assert.throws(() => transform({}), TypeError, 'Функция не передана');
-        assert.throws(() => transform({}, 'не функция'), TypeError, 'Вместо функции передана строка');
+        const expectedError = new TypeError('Аргумент transformFn должен быть функцией');
+
+        assert.throws(() => transform({ a: 1 }), expectedError, 'Функция не передана');
+        assert.throws(() => transform({ a: 1 }, 'не функция'), expectedError, 'Вместо функции передана строка');
     });
 });
