@@ -9,6 +9,9 @@
  * @param {Object} obj - исходный объект (или массив)
  * @param {Function} transformFn - функция, применяемая к каждому конечному значению
  *
+ * @throws {TypeError} Если obj не является объектом
+ * @throws {TypeError} Если transformFn не является функцией
+ *
  * @example
  * // returns { a: 2, b: 4 }
  * transform({ a: 1, b: 2 }, value => value * 2);
@@ -20,6 +23,14 @@
  * @returns {Object}
  */
 const transform = (obj, transformFn) => {
+    if (typeof obj !== 'object' || obj === null) {
+        throw new TypeError('Аргумент obj должен быть объектом');
+    }
+
+    if (typeof transformFn !== 'function') {
+        throw new TypeError('Аргумент transformFn должен быть функцией');
+    }
+
     // Массив копируем в массив, объект - в объект, чтобы не потерять исходный тип
     const result = Array.isArray(obj) ? [] : {};
 

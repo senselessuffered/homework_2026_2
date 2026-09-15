@@ -35,7 +35,7 @@ QUnit.module('Тестируем функцию transform', () => {
         assert.deepEqual(result, { name: 'АНЯ', city: 'МОСКВА' }, 'Строки должны быть в верхнем регистре');
     });
 
-    QUnit.test('Работает правильно с null', (assert) => {
+    QUnit.test('Работает правильно с null внутри объекта', (assert) => {
         const originalObject = { a: null, b: 1 };
         const transformFunction = (value) => String(value);
         const result = transform(originalObject, transformFunction);
@@ -49,5 +49,18 @@ QUnit.module('Тестируем функцию transform', () => {
         transform(originalObject, transformFunction);
 
         assert.deepEqual(originalObject, { a: 1, b: { c: 2 } }, 'Исходный объект и вложенный объект не должны измениться');
+    });
+
+    QUnit.test('Бросает TypeError, если obj не объект', (assert) => {
+        const transformFunction = (value) => value * 2;
+
+        assert.throws(() => transform(null, transformFunction), TypeError, 'null - не объект');
+        assert.throws(() => transform(42, transformFunction), TypeError, 'Число - не объект');
+        assert.throws(() => transform('abc', transformFunction), TypeError, 'Строка - не объект');
+    });
+
+    QUnit.test('Бросает TypeError, если transformFn не функция', (assert) => {
+        assert.throws(() => transform({}), TypeError, 'Функция не передана');
+        assert.throws(() => transform({}, 'не функция'), TypeError, 'Вместо функции передана строка');
     });
 });
