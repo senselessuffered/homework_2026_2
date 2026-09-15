@@ -19,7 +19,7 @@
  *
  * @returns {Object}
  */
-const transform = function (obj, transformFn) {
+const transform = (obj, transformFn) => {
     // Массив копируем в массив, объект - в объект, чтобы не потерять исходный тип
     const result = Array.isArray(obj) ? [] : {};
 
