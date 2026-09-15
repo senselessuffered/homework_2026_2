@@ -52,15 +52,9 @@ const transform = (obj, transformFn) => {
      * @param {*} value - значение из объекта или элемент массива
      * @returns {*}
      */
-    const transformValue = (value) => {
-        if (isPlainObjectOrArray(value)) {
-            // Вложенный объект или массив разбираем тем же алгоритмом
-            return transform(value, transformFn);
-        }
-
-        // Остальное (примитивы, null, Date, Map, ...) - преобразуем целиком
-        return transformFn(value);
-    };
+    const transformValue = (value) => (isPlainObjectOrArray(value)
+        ? transform(value, transformFn)
+        : transformFn(value));
 
     // map возвращает новый массив той же длины
     if (Array.isArray(obj)) {
