@@ -1,6 +1,25 @@
 'use strict';
 
 /**
+ * Проверяет, что значение - обычный объект или массив, то есть его нужно обходить.
+ * Object.prototype.toString возвращает '[object Object]' только для обычных объектов:
+ * для null это '[object Null]', для Date - '[object Date]', для Map - '[object Map]'
+ * @param {*} value - проверяемое значение
+ *
+ * @example
+ * // returns true
+ * isPlainObjectOrArray({ a: 1 });
+ *
+ * @example
+ * // returns false
+ * isPlainObjectOrArray(new Date());
+ *
+ * @returns {boolean}
+ */
+const isPlainObjectOrArray = (value) => Array.isArray(value)
+    || Object.prototype.toString.call(value) === '[object Object]';
+
+/**
  * Рекурсивно применяет функцию преобразования ко всем значениям объекта.
  * Ключи сохраняются, меняются только значения. Вложенные обычные объекты
  * и массивы обрабатываются рекурсивно на любую глубину. Остальные значения,
@@ -28,16 +47,6 @@
  * @returns {Object|Array}
  */
 const transform = (obj, transformFn) => {
-    /**
-     * Проверяет, что значение - обычный объект или массив, то есть его нужно обходить.
-     * Object.prototype.toString возвращает '[object Object]' только для обычных объектов:
-     * для null это '[object Null]', для Date - '[object Date]', для Map - '[object Map]'
-     * @param {*} value - проверяемое значение
-     * @returns {boolean}
-     */
-    const isPlainObjectOrArray = (value) => Array.isArray(value)
-        || Object.prototype.toString.call(value) === '[object Object]';
-
     if (!isPlainObjectOrArray(obj)) {
         throw new TypeError('Аргумент obj должен быть обычным объектом или массивом');
     }
